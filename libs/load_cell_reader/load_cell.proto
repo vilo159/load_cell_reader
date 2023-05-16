@@ -1,0 +1,74 @@
+// Copyright (c) farm-ng, inc.
+//
+// Licensed under the Amiga Development Kit License (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     https://github.com/farm-ng/amiga-dev-kit/blob/main/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package load_cell.proto;
+
+service CanbusService {
+  // Streams raw messages received on the CAN bus
+  rpc streamCanbusMessages(StreamCanbusRequest)
+      returns (stream StreamCanbusReply) {}
+  // Sends messages on the CAN bus
+  rpc sendCanbusMessage(stream SendCanbusMessageRequest)
+      returns (stream SendCanbusMessageReply) {}
+}
+
+message StreamCanbusRequest {
+}
+
+message StreamCanbusReply {
+  RawCanbusMessages messages = 1;
+}
+
+message SendCanbusMessageRequest {
+  RawCanbusMessage message = 1;
+}
+
+message SendCanbusMessageReply {
+  bool success = 1;
+}
+
+message RawCanbusMessage {
+  // The time the message is "received" / "sent" on the canbus
+  // in the steady_clock/time.montonic() time domain
+  double stamp = 1;
+  uint32 id = 2; // CAN node ID of the message
+  bool error = 3;
+  bool remote_transmission = 4;
+  bytes data = 5; // Encoded payload of the CAN packet
+}
+
+message RawCanbusMessages {
+  repeated RawCanbusMessage messages = 1;
+}
+
+// I don't think I really need the following stuff???
+
+message StreamLoadCellForceRequest {
+}
+
+// Proto definition containing force from a load cell
+// Corresponds to LoadCellForce class??
+message LoadCellForce {
+    double stamp = 1; // stamp of the RawCanbusMessage containing the motor state values
+    uint32 id = 2; // CAN node ID of the microcontroller?
+    double force = 3; // Load Cell measured force
+}
+
+// Packages multiple LoadCellForce's for the client
+message StreamLoadCellForcesReply {
+  // List of LoadCellForce's
+  repeated LoadCellForce forces = 1;
+}
