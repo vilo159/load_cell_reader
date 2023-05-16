@@ -86,6 +86,8 @@ class LoadCellApp(App):
         #     asyncio.ensure_future(self.send_can_msgs(canbus_client))
         # )
 
+        return await asyncio.gather(run_wrapper(), *self.async_tasks)
+
     async def stream_canbus(self, client: CanbusClient) -> None:
         """This task:
 
