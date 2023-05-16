@@ -51,11 +51,29 @@ class Packet:
         """Age of the most recent message."""
         return time.monotonic() - self.stamp.stamp
 
-
-class LoadCellTx(Packet):
+class LoadCellRpdo1(Packet):
     """Load Cell voltage and/or force?."""
 
-    cob_id = 0x180 #TODO change this??
+    def __init__(self, meas_force: float = 0.0):
+        self.format = "<d"
+        self.meas_force = meas_force
+        self.stamp(time.monotonic())
+
+    def encode(self):
+        """Returns the data contained by the class encoded as CAN message data."""
+        return pack(self.format, self.meas_force)
+
+    def decode(self, data):
+        """Decodes CAN message data and populates the values of the class."""
+        self.meas_force = unpack(self.format, data)
+
+    def __str__(self):
+        return "LOAD CELL RPDO1 Force {:0.3f} @ time {}".format(self.meas_force, self.stamp.stamp) 
+
+class LoadCellTpdo1(Packet):
+    """Load Cell voltage and/or force?."""
+
+    cob_id = 0x180
 
     def __init__(self, meas_force: float = 0.0):
         self.format = "<d" 
@@ -71,10 +89,10 @@ class LoadCellTx(Packet):
         self.meas_force = unpack(self.format, data)
 
     def __str__(self):
-        return "LOAD CELL TX Force {:0.3f} @ time {}".format(self.meas_force, self.stamp.stamp) 
+        return "LOAD CELL TPDO1 Force {:0.3f} @ time {}".format(self.meas_force, self.stamp.stamp) 
 
 
-def parse_load_cell_tx_proto(message: canbus_pb2.RawCanbusMessage) -> LoadCellTx | None: #TODO Annotate with message type?
+def parse_load_cell_tx_proto(message: canbus_pb2.RawCanbusMessage) -> LoadCellTpdo1 | None: #TODO Annotate with message type?
     """Parses a canbus message from the Feather microcontroller.
     IFF the message came from the microcontrollerand contains LoadCellTx structure, formatting, and cobid.
 
@@ -85,6 +103,6 @@ def parse_load_cell_tx_proto(message: canbus_pb2.RawCanbusMessage) -> LoadCellTx
     """
     # TODO: add some checkers, or make python CHECK_API
     # TODO: Need to add check for data type back in, right now it'll accept anything coming in ad might crash if the data type is wrong.
-    if message.id != LoadCellTx.cob_id + SDK_NODE_ID:
+    if message.id != LoadCellTpdo1.cob_id + SDK_NODE_ID:
         return None
-    return LoadCellTx.from_can_data(message.data, stamp=message.stamp)
+    return LoadCellTpdo1.from_can_data(message.data, stamp=message.stamp)

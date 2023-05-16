@@ -8,7 +8,7 @@ from typing import Optional
 import grpc
 from farm_ng.canbus import canbus_pb2
 from farm_ng.canbus.canbus_client import CanbusClient
-from load_cell_reader.load_cell_packet import LoadCellTx
+from load_cell_reader.load_cell_packet import LoadCellTpdo1
 from load_cell_reader.load_cell_packet import parse_load_cell_tx_proto
 
 #Not sure if I need these yet
@@ -50,7 +50,7 @@ class LoadCellApp(App):
         self.stream_every_n: int = stream_every_n
 
         # Received values
-        self.load_cell_tx: LoadCellTx = LoadCellTx()
+        self.load_cell_tx: LoadCellTpdo1 = LoadCellTpdo1()
 
         # Parameters
         self.meas_force: float = 0.0
@@ -92,7 +92,7 @@ class LoadCellApp(App):
         """This task:
 
         - listens to the canbus client's stream
-        - filters for LoadCellTx messages
+        - filters for LoadCellTpdo1 messages
         - extracts useful values from LoadCellTx messages
         """
         while self.root is None:
@@ -134,7 +134,7 @@ class LoadCellApp(App):
                 continue
 
             for proto in response.messages.messages:
-                load_cell_tx: Optional[LoadCellTx] = parse_load_cell_tx_proto(proto)
+                load_cell_tx: Optional[LoadCellTpdo1] = parse_load_cell_tx_proto(proto)
                 if load_cell_tx:
                     # Store the value for possible other uses
                     self.load_cell_tx = load_cell_tx
