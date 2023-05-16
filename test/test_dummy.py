@@ -1,7 +1,7 @@
 """Template test module."""
 import pytest
-from amiga_package import __version__
-from amiga_package import ops
+from load_cell_reader import __version__
+from load_cell_reader import ops
 
 # import the internal libs and test
 
