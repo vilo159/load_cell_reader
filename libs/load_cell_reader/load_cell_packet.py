@@ -65,7 +65,7 @@ class LoadCellRpdo1(Packet):
 
     def decode(self, data):
         """Decodes CAN message data and populates the values of the class."""
-        self.meas_force = unpack(self.format, data)
+        self.meas_force = unpack(self.format, data)[0]
 
     def __str__(self):
         return "LOAD CELL RPDO1 Force {:0.3f} @ time {}".format(self.meas_force, self.stamp.stamp) 
@@ -92,7 +92,7 @@ class LoadCellTpdo1(Packet):
         return "LOAD CELL TPDO1 Force {:0.3f} @ time {}".format(self.meas_force, self.stamp.stamp) 
 
 
-def parse_load_cell_tx_proto(message: canbus_pb2.RawCanbusMessage) -> LoadCellTpdo1 | None: #TODO Annotate with message type?
+def parse_load_cell_tpdo1_proto(message: canbus_pb2.RawCanbusMessage) -> LoadCellTpdo1 | None: #TODO Annotate with message type?
     """Parses a canbus message from the Feather microcontroller.
     IFF the message came from the microcontrollerand contains LoadCellTx structure, formatting, and cobid.
 

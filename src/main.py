@@ -9,7 +9,7 @@ import grpc
 from farm_ng.canbus import canbus_pb2
 from farm_ng.canbus.canbus_client import CanbusClient
 from load_cell_reader.load_cell_packet import LoadCellTpdo1
-from load_cell_reader.load_cell_packet import parse_load_cell_tx_proto
+from load_cell_reader.load_cell_packet import parse_load_cell_tpdo1_proto
 
 #Not sure if I need these yet
 from farm_ng.service import service_pb2
@@ -134,13 +134,13 @@ class LoadCellApp(App):
                 continue
 
             for proto in response.messages.messages:
-                load_cell_tx: Optional[LoadCellTpdo1] = parse_load_cell_tx_proto(proto)
-                if load_cell_tx:
+                load_cell_tpdo1: Optional[LoadCellTpdo1] = parse_load_cell_tpdo1_proto(proto)
+                if load_cell_tpdo1:
                     # Store the value for possible other uses
-                    self.load_cell_tx = load_cell_tx
+                    #self.load_cell_tpdo1 = load_cell_tpdo1
 
                     # Update the Label values as they are received
-                    self.load_cell_force = str(load_cell_tx.meas_force)
+                    self.load_cell_force = str(load_cell_tpdo1.meas_force)
                     self.root.ids.force_label.text = (
                         f"{'Force from Load Cell'}: {self.load_cell_force}"
                     )
