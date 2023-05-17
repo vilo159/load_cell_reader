@@ -140,7 +140,7 @@ class LoadCellApp(App):
                     #self.load_cell_tpdo1 = load_cell_tpdo1
 
                     # Update the Label values as they are received
-                    self.load_cell_force = str(load_cell_tpdo1.meas_force)
+                    self.load_cell_force = load_cell_tpdo1.meas_force
                     self.root.ids.force_label.text = (
                         f"{'Force from Load Cell'}: {self.load_cell_force}"
                     )
