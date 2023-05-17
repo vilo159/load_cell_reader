@@ -8,14 +8,11 @@ from typing import Optional
 import grpc
 from farm_ng.canbus import canbus_pb2
 from farm_ng.canbus.canbus_client import CanbusClient
+from farm_ng.service import service_pb2
+from farm_ng.service.service_client import ClientConfig
 from load_cell_reader.load_cell_packet import LoadCellTpdo1
 from load_cell_reader.load_cell_packet import parse_load_cell_tpdo1_proto
 
-#Not sure if I need these yet
-from farm_ng.service import service_pb2
-from farm_ng.service.service_client import ClientConfig
-
-# import internal libs
 
 # Must come before kivy imports
 os.environ["KIVY_NO_ARGS"] = "1"
@@ -34,7 +31,7 @@ Config.set("kivy", "keyboard_mode", "systemanddock")
 from kivy.app import App  # noqa: E402
 from kivy.lang.builder import Builder  # noqa: E402
 from kivy.graphics.texture import Texture  # noqa: E402
-from kivy.properties import StringProperty  # noqa: E402
+from kivy.properties import StringProperty, NumericProperty  # noqa: E402
 
 
 class LoadCellApp(App):
@@ -50,7 +47,7 @@ class LoadCellApp(App):
         self.stream_every_n: int = stream_every_n
 
         # Received values
-        self.load_cell_tx: LoadCellTpdo1 = LoadCellTpdo1()
+        self.load_cell_tpdo1: LoadCellTpdo1 = LoadCellTpdo1()
 
         # Parameters
         self.meas_force: float = 0.0
