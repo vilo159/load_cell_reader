@@ -65,7 +65,8 @@ class LoadCellRpdo1(Packet):
 
     def decode(self, data):
         """Decodes CAN message data and populates the values of the class."""
-        self.meas_force = unpack(self.format, data)[0]
+        force = unpack(self.format, data)
+        self.meas_force = force[0]
 
     def __str__(self):
         return "LOAD CELL RPDO1 Force {:0.3f} @ time {}".format(self.meas_force, self.stamp.stamp) 
