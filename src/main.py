@@ -35,7 +35,7 @@ from kivy.app import App  # noqa: E402
 from kivy.lang.builder import Builder  # noqa: E402
 #from kivy.graphics.texture import Texture  # noqa: E402
 from kivy.properties import StringProperty, NumericProperty  # noqa: E402
-from kivy.garden.graph import MeshLinePlot #, Graph # noqa: E402
+from kivy_garden.graph import MeshLinePlot #, Graph # noqa: E402
 
 # DARLING GranuStem Imports
 from load_cell_reader.Datapoint import Datapoint
