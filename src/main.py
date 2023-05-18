@@ -45,7 +45,7 @@ from res.elements import *
 
 #--------------------------------- Load Cell Class & Execution ---------------------------------
 
-INTERVAL = .003
+INTERVAL = .001
 SECOND_CAP = 1/INTERVAL
 
 class LoadCellApp(App, BaseScreen):
