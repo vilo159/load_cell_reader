@@ -54,43 +54,43 @@ class Packet:
 class LoadCellRpdo1(Packet):
     """Load Cell voltage and/or force?."""
 
-    def __init__(self, meas_force: float = 0.0):
+    def __init__(self, meas_val: float = 0.0):
         self.format = "<d"
-        self.meas_force = meas_force
+        self.meas_val = meas_val
         self.stamp(time.monotonic())
 
     def encode(self):
         """Returns the data contained by the class encoded as CAN message data."""
-        return pack(self.format, self.meas_force)
+        return pack(self.format, self.meas_val)
 
     def decode(self, data):
         """Decodes CAN message data and populates the values of the class."""
         force = unpack(self.format, data)
-        self.meas_force = force[0]
+        self.meas_val = force[0]
 
     def __str__(self):
-        return "LOAD CELL RPDO1 Force {:0.3f} @ time {}".format(self.meas_force, self.stamp.stamp) 
+        return "LOAD CELL RPDO1 Force {:0.3f} @ time {}".format(self.meas_val, self.stamp.stamp) 
 
 class LoadCellTpdo1(Packet):
     """Load Cell voltage and/or force?."""
 
     cob_id = 0x180
 
-    def __init__(self, meas_force: float = 0.0):
+    def __init__(self, meas_val: float = 0.0):
         self.format = "<d" 
-        self.meas_force = meas_force
+        self.meas_val = meas_val
         self.stamp_packet(time.monotonic())
 
     def encode(self):
         """Returns the data contained by the class encoded as CAN message data."""
-        return pack(self.format, self.meas_force)
+        return pack(self.format, self.meas_val)
 
     def decode(self, data):
         """Decodes CAN message data and populates the values of the class."""
-        self.meas_force = unpack(self.format, data)
+        self.meas_val = unpack(self.format, data)
 
     def __str__(self):
-        return "LOAD CELL TPDO1 Force {:0.3f} @ time {}".format(self.meas_force, self.stamp.stamp) 
+        return "LOAD CELL TPDO1 Force {:0.3f} @ time {}".format(self.meas_val, self.stamp.stamp) 
 
 
 def parse_load_cell_tpdo1_proto(message: canbus_pb2.RawCanbusMessage) -> LoadCellTpdo1 | None: #TODO Annotate with message type?
