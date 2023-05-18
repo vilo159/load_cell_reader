@@ -1,18 +1,15 @@
-#from sensors.Temperature import Temperature
-# from sensors.Humidity import Humidity
-from X_Load import X_Load
 import datetime
+from X_Load import X_Load
 
 class Sensor:
 
     def __init__(self):
         self.REAL_DATA = True
-        self.keys = ["Temperature","Humidity","Location","Time","X Load","Y Load","Friction Load","IMU Angle", "Load Cell Height"]
+        self.keys = ["Time","X Load","Y Load","Friction Load","IMU Angle", "Load Cell Height"]
         self.x_load = X_Load()
         self.time = datetime.datetime.now().strftime("%I:%M:%S %p")
         self.sensor_data = {}
         self.cpu_time = 0
-
 
     def get_sensor_data(self, adc_out = 0):
         self.sensor_data["X Load"] = round(self.x_load.get_data(adc_out),4)

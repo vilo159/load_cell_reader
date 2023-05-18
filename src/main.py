@@ -20,8 +20,6 @@ from load_cell_reader.load_cell_packet import LoadCellTpdo1
 from load_cell_reader.load_cell_packet import parse_load_cell_tpdo1_proto
 
 # DARLING Granustem Imports
-from load_cell_reader.TestSingleton import TestSingleton
-from load_cell_reader.Sensor import Sensor
 from load_cell_reader.Datapoint import Datapoint
 from load_cell_reader.BaseScreen import BaseScreen
 from res.elements import *
@@ -86,7 +84,6 @@ class LoadCellApp(App, BaseScreen):
         self.y_max= 5
         self.x_major = int(self.x_max/5)
         self.y_major = int(self.y_max/5)
-        self.test_sensor = Sensor()
         self.plot = MeshLinePlot(color=[1, 1, 1, 1])
 
 
