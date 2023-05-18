@@ -79,8 +79,8 @@ class LoadCellApp(App, BaseScreen):
         self.double_counter = 0
         self.start_time = datetime.datetime.now()
         self.datapoints = []
-        self.x_max= 5
-        self.y_max= 5
+        self.x_max= 2
+        self.y_max= 2
         self.x_major = int(self.x_max/5)
         self.y_major = int(self.y_max/5)
         self.plot = MeshLinePlot(color=[1, 1, 1, 1])
