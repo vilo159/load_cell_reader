@@ -1,3 +1,4 @@
+#:import MeshLinePlot kivy.garden.graph.MeshLinePlot
 
 <TestInProgressInfoBox@Label>:
     font_size: 40
@@ -14,37 +15,23 @@
             pos: self.pos
             size: self.size
 
+<GranuStopButton@Button>
+	background_color: (0,0,0,1)
+	font_size: 35
+	halign: 'center'
+	valign: 'middle'
+    markup: True
+    bold: True
+
 <GraphTitle@Label>
     size_hint_max_y: 30
     font_size: 20
     markup: True
     bold: True
 
-<main>:       
+<TestInProgressScreen>:
+	name: 'test_in_progress_screen'
     GranuContainer:
-        Button:
-            id: back_btn_layout
-            pos_hint: {"x": 0.0, "top": 1.0}
-            background_color: 0, 0, 0, 0
-            size_hint: 0.1, 0.1
-            background_normal: "assets/back_button.png"
-            on_release: app.on_exit_btn()
-            Image:
-                source: "assets/back_button_normal.png" if self.parent.state == "normal" else "assets/back_button_down.png"
-                pos: self.parent.pos
-                size: self.parent.size
-
-        GranuSideAreaTest:
-            GranuSideButton:
-                text: 'Start Test'
-                on_release: app.on_start_btn()
-            GranuSideButton:
-                text: 'Stop Test'
-                on_release: app.on_stop_btn()
-            GranuSideButton:
-                text: 'Reset Data'
-                on_release: app.on_reset_btn()
-
         GranuContent:
             GridLayout:
                 size_hint_y: 0.4
@@ -53,16 +40,23 @@
                 GranuTitle:
                     text: 'Test in Progress'
                     size_hint_y: .4
-                TestInProgressInfoBox:
-                    id: test_time_box
-                    text: "Test in progress for\n" + str(root.test_time) + " seconds"
-                    #size_hint_y: .3
+                GridLayout:
+                    cols: 2
+                    spacing: 10
+                    GranuStopButton:
+                        text: 'Stop'
+                        size_hint_x: .37
+                        on_release:
+                            root.move_to('testing_results_screen')
+                    TestInProgressInfoBox:
+                        id: test_time_box
+                        text: "Test in progress for\n" + str(root.test_time) + " seconds"
+                        #size_hint_y: .3
             
             GridLayout:
                 rows: 2
                 GraphTitle:
                     text: 'X-Force Loading'
-                    size_hint_max_y: 30
                 Graph:
                     id: graph_test
                     plot: MeshLinePlot
@@ -73,12 +67,10 @@
                     y_ticks_major:root.y_major
                     y_grid_label:True
                     x_grid_label:True
+                    #padding:5
                     x_grid:True
                     y_grid:True
                     xmin:0
                     ymin:0
                     xmax:root.x_max
                     ymax:root.y_max
-
-
-          

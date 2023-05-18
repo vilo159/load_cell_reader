@@ -1,10 +1,16 @@
 # Copyright (c) farm-ng, inc. Amiga Development Kit License, Version 0.1
+
+#----------------------------------- Imports & Setup -----------------------------------
+# System Imports
 import argparse
 import asyncio
 import os
+import datetime
+import math
 from typing import List
 from typing import Optional
 
+# Farm-Ng resources/ CAN Imports
 import grpc
 from farm_ng.canbus import canbus_pb2
 from farm_ng.canbus.canbus_client import CanbusClient
@@ -13,13 +19,17 @@ from farm_ng.service.service_client import ClientConfig
 from load_cell_reader.load_cell_packet import LoadCellTpdo1
 from load_cell_reader.load_cell_packet import parse_load_cell_tpdo1_proto
 
+# DARLING Granustem Imports
+from load_cell_reader.TestSingleton import TestSingleton
+from load_cell_reader.Sensor import Sensor
+from load_cell_reader.Datapoint import Datapoint
+from load_cell_reader.BaseScreen import BaseScreen
+from res.elements import *
 
 # Must come before kivy imports
 os.environ["KIVY_NO_ARGS"] = "1"
-
 # gui configs must go before any other kivy import
 from kivy.config import Config  # noreorder # noqa: E402
-
 Config.set("graphics", "resizable", False)
 Config.set("graphics", "width", "1280")
 Config.set("graphics", "height", "800")
@@ -27,18 +37,29 @@ Config.set("graphics", "fullscreen", "false")
 Config.set("input", "mouse", "mouse,disable_on_activity")
 Config.set("kivy", "keyboard_mode", "systemanddock")
 
-# kivy imports
+# Kivy Imports
 from kivy.app import App  # noqa: E402
 from kivy.lang.builder import Builder  # noqa: E402
-from kivy.graphics.texture import Texture  # noqa: E402
+#from kivy.graphics.texture import Texture  # noqa: E402
 from kivy.properties import StringProperty, NumericProperty  # noqa: E402
+from kivy.garden.graph import MeshLinePlot #, Graph # noqa: E402
 
 
-class LoadCellApp(App):
+#--------------------------------- Load Cell Class & Execution ---------------------------------
+
+INTERVAL = .003
+SECOND_CAP = 1/INTERVAL
+
+class LoadCellApp(App, BaseScreen):
     """Base class for the main Kivy app."""
 
     # For Kivy labels I guess? 
     load_cell_force = StringProperty("???")
+    test_time = NumericProperty()
+    x_max = NumericProperty()
+    y_max = NumericProperty()
+    x_major = NumericProperty()
+    y_major = NumericProperty()
 
     def __init__(self, address: str, canbus_port: int, stream_every_n: int) -> None:
         super().__init__()
@@ -49,10 +70,32 @@ class LoadCellApp(App):
         # Received values
         self.load_cell_tpdo1: LoadCellTpdo1 = LoadCellTpdo1()
 
-        # Parameters
-        self.meas_force: float = 0.0
-
         self.async_tasks: List[asyncio.Task] = []
+
+        # Test Start/Stop
+        self.test_started = False
+
+        # Plotter Parameters
+        self.meas_force: float = 0.0
+        self.test_time = 0
+        self.second_counter = 0
+        self.double_counter = 0
+        self.start_time = datetime.datetime.now()
+        self.datapoints = []
+        self.x_max= 5
+        self.y_max= 5
+        self.x_major = int(self.x_max/5)
+        self.y_major = int(self.y_max/5)
+        self.test_sensor = Sensor()
+        self.plot = MeshLinePlot(color=[1, 1, 1, 1])
+
+
+    def find_max_x_load(self):
+        max = 0
+        for datapoint in self.datapoints:
+            if(datapoint.x_load > max):
+                max = datapoint.x_load
+        return max
 
     def build(self):
         return Builder.load_file("res/main.kv")
@@ -60,6 +103,25 @@ class LoadCellApp(App):
     def on_exit_btn(self) -> None:
         """Kills the running kivy application."""
         App.get_running_app().stop()
+
+    def on_start_btn(self) -> None:
+        """Starts the data collection."""
+        self.test_started = True
+        
+    def on_stop_btn(self) -> None:
+        """Stops the data collection."""
+        self.test_started = False
+
+    def on_reset_btn(self) -> None:
+        """Resets the test parameters."""
+        self.test_started = False
+        self.datapoints = []
+        self.test_time = 0
+        self.start_time = datetime.datetime.now()
+        self.second_counter = 0
+        self.double_counter = 0
+        self.graph.remove_plot(self.plot)
+        self.graph._clear_buffer()
 
     async def app_func(self):
         async def run_wrapper() -> None:
@@ -132,15 +194,42 @@ class LoadCellApp(App):
 
             for proto in response.messages.messages:
                 load_cell_tpdo1: Optional[LoadCellTpdo1] = parse_load_cell_tpdo1_proto(proto)
-                if load_cell_tpdo1:
-                    # Store the value for possible other uses
-                    #self.load_cell_tpdo1 = load_cell_tpdo1
-
+                self.load_cell_tpdo1 = load_cell_tpdo1
+                
+                if self.test_started and load_cell_tpdo1:
                     # Update the Label values as they are received
-                    self.load_cell_force = str(load_cell_tpdo1.meas_force[0])
-                    self.root.ids.force_label.text = (
-                        f"{'Force from Load Cell'}: {self.load_cell_force}"
-                    )
+                    # self.root.ids.force_label.text = (
+                    #     f"{'Force from Load Cell'}: {str(load_cell_tpdo1.meas_force[0])}"
+                    # )
+
+                    # Update plot every XXX datapoints
+                    self.second_counter += 1
+                    time_delta = datetime.datetime.now() - self.start_time
+                    total_time_passed = time_delta.seconds + (time_delta.microseconds * .000001)
+                    self.test_time = time_delta.seconds
+                    if self.second_counter >= SECOND_CAP/2:
+                        self.double_counter += 1
+                        self.second_counter = 0
+                        self.graph = self.ids['graph_test']
+                        self.graph.remove_plot(self.plot)
+                        self.graph._clear_buffer()
+                        self.plot = MeshLinePlot(color=[1, 1, 1, 1])
+                        last_index = len(self.datapoints) - 1
+                        self.x_max = math.ceil(self.datapoints[last_index].timestamp / 5) * 5
+                        self.y_max = max(self.y_max2, math.ceil(self.datapoints[last_index].x_load / 5) * 5)
+
+                        self.x_major = int(self.x_max/5)
+                        self.y_major = int(self.y_max/5)
+
+                        self.plot.points = [(self.datapoints[i].timestamp, self.datapoints[i].x_load) for i in range(0, len(self.datapoints), 5)]
+                        
+                        self.graph.add_plot(self.plot)
+                    
+                    # Parse last value recieved
+                    self.meas_force = load_cell_tpdo1.meas_force[0]
+                    new_datapoint = Datapoint(total_time_passed, self.x_load)
+                    self.datapoints.append(new_datapoint)
+
 
 
 if __name__ == "__main__":
