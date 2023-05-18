@@ -218,7 +218,7 @@ class LoadCellApp(App, BaseScreen):
                         self.x_major = int(self.x_max/5)
                         self.y_major = int(self.y_max/5)
 
-                        self.plot.points = self.datapoints#[(self.datapoints[i].timestamp, self.datapoints[i].meas_val) for i in range(0, len(self.datapoints))]
+                        self.plot.points = [(self.datapoints[i].timestamp, self.datapoints[i].meas_val) for i in range(0, len(self.datapoints))]
                         
                         self.graph.add_plot(self.plot)
                     
