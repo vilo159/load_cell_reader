@@ -212,13 +212,13 @@ class LoadCellApp(App, BaseScreen):
                         self.graph._clear_buffer()
                         self.plot = MeshLinePlot(color=[1, 1, 1, 1])
                         last_index = len(self.datapoints) - 1
-                        self.x_max = math.ceil(self.datapoints[last_index].timestamp / 5) * 5
-                        self.y_max = max(self.y_max, math.ceil(self.datapoints[last_index].meas_val / 5) * 5)
+                        self.x_max = math.ceil(self.datapoints[last_index].timestamp)
+                        self.y_max = max(self.y_max, math.ceil(self.datapoints[last_index].meas_val))
 
                         self.x_major = int(self.x_max/5)
                         self.y_major = int(self.y_max/5)
 
-                        self.plot.points = [(self.datapoints[i].timestamp, self.datapoints[i].meas_val) for i in range(0, len(self.datapoints), 1)]
+                        self.plot.points = self.datapoints#[(self.datapoints[i].timestamp, self.datapoints[i].meas_val) for i in range(0, len(self.datapoints))]
                         
                         self.graph.add_plot(self.plot)
                     
