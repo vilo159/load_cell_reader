@@ -35,7 +35,7 @@ from kivy.app import App  # noqa: E402
 from kivy.lang.builder import Builder  # noqa: E402
 #from kivy.graphics.texture import Texture  # noqa: E402
 from kivy.properties import StringProperty, NumericProperty  # noqa: E402
-from kivy_garden.graph import MeshLinePlot #, Graph # noqa: E402
+from kivy_garden.graph import MeshLinePlot # noqa: E402
 
 # DARLING GranuStem Imports
 from load_cell_reader.Datapoint import Datapoint
@@ -51,13 +51,12 @@ SECOND_CAP = 1/INTERVAL
 class LoadCellApp(App, BaseScreen):
     """Base class for the main Kivy app."""
 
-    # For Kivy labels I guess? 
-    load_cell_force = StringProperty("???")
-    test_time = NumericProperty()
-    x_max = NumericProperty()
-    y_max = NumericProperty()
-    x_major = NumericProperty()
-    y_major = NumericProperty()
+    # Kivy variables
+    test_time = NumericProperty(0)
+    x_max = NumericProperty(0)
+    y_max = NumericProperty(0)
+    x_major = NumericProperty(0)
+    y_major = NumericProperty(0)
 
     def __init__(self, address: str, canbus_port: int, stream_every_n: int) -> None:
         super().__init__()
@@ -134,7 +133,7 @@ class LoadCellApp(App, BaseScreen):
         )
         canbus_client: CanbusClient = CanbusClient(canbus_config)
 
-        # Canbus task(s)
+        # Canbus task(s)For Kivy labels I guess? 
         self.async_tasks.append(
             asyncio.ensure_future(self.stream_canbus(canbus_client))
         )
