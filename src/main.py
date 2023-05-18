@@ -19,11 +19,6 @@ from farm_ng.service.service_client import ClientConfig
 from load_cell_reader.load_cell_packet import LoadCellTpdo1
 from load_cell_reader.load_cell_packet import parse_load_cell_tpdo1_proto
 
-# DARLING Granustem Imports
-from load_cell_reader.Datapoint import Datapoint
-from load_cell_reader.BaseScreen import BaseScreen
-from res.elements import *
-
 # Must come before kivy imports
 os.environ["KIVY_NO_ARGS"] = "1"
 # gui configs must go before any other kivy import
@@ -41,6 +36,11 @@ from kivy.lang.builder import Builder  # noqa: E402
 #from kivy.graphics.texture import Texture  # noqa: E402
 from kivy.properties import StringProperty, NumericProperty  # noqa: E402
 from kivy.garden.graph import MeshLinePlot #, Graph # noqa: E402
+
+# DARLING GranuStem Imports
+from load_cell_reader.Datapoint import Datapoint
+from load_cell_reader.BaseScreen import BaseScreen
+from res.elements import *
 
 
 #--------------------------------- Load Cell Class & Execution ---------------------------------
