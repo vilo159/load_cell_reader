@@ -1,4 +1,4 @@
 class Datapoint:
-    def __init__(self, timestamp, x_load,):
+    def __init__(self, timestamp, meas_val,):
         self.timestamp = timestamp
-        self.x_load = x_load
+        self.meas_val = meas_val

@@ -73,7 +73,7 @@ class LoadCellApp(App, BaseScreen):
         self.test_started = False
 
         # Plotter Parameters
-        self.meas_force: float = 0.0
+        self.meas_val: float = 0.0
         self.test_time = 0
         self.second_counter = 0
         self.double_counter = 0
@@ -84,13 +84,14 @@ class LoadCellApp(App, BaseScreen):
         self.x_major = int(self.x_max/5)
         self.y_major = int(self.y_max/5)
         self.plot = MeshLinePlot(color=[1, 1, 1, 1])
+        
 
 
-    def find_max_x_load(self):
+    def find_max_meas_val(self):
         max = 0
         for datapoint in self.datapoints:
-            if(datapoint.x_load > max):
-                max = datapoint.x_load
+            if(datapoint.meas_val > max):
+                max = datapoint.meas_val
         return max
 
     def build(self):
@@ -195,7 +196,7 @@ class LoadCellApp(App, BaseScreen):
                 if self.test_started and load_cell_tpdo1:
                     # Update the Label values as they are received
                     # self.root.ids.force_label.text = (
-                    #     f"{'Force from Load Cell'}: {str(load_cell_tpdo1.meas_force[0])}"
+                    #     f"{'Force from Load Cell'}: {str(load_cell_tpdo1.meas_val[0])}"
                     # )
 
                     # Update plot every XXX datapoints
@@ -206,24 +207,24 @@ class LoadCellApp(App, BaseScreen):
                     if self.second_counter >= SECOND_CAP/2:
                         self.double_counter += 1
                         self.second_counter = 0
-                        self.graph = self.ids['graph_test']
+                        self.graph = self.root.ids['graph_test']
                         self.graph.remove_plot(self.plot)
                         self.graph._clear_buffer()
                         self.plot = MeshLinePlot(color=[1, 1, 1, 1])
                         last_index = len(self.datapoints) - 1
                         self.x_max = math.ceil(self.datapoints[last_index].timestamp / 5) * 5
-                        self.y_max = max(self.y_max2, math.ceil(self.datapoints[last_index].x_load / 5) * 5)
+                        self.y_max = max(self.y_max2, math.ceil(self.datapoints[last_index].meas_val / 5) * 5)
 
                         self.x_major = int(self.x_max/5)
                         self.y_major = int(self.y_max/5)
 
-                        self.plot.points = [(self.datapoints[i].timestamp, self.datapoints[i].x_load) for i in range(0, len(self.datapoints), 5)]
+                        self.plot.points = [(self.datapoints[i].timestamp, self.datapoints[i].meas_val) for i in range(0, len(self.datapoints), 5)]
                         
                         self.graph.add_plot(self.plot)
                     
                     # Parse last value recieved
-                    self.meas_force = load_cell_tpdo1.meas_force[0]
-                    new_datapoint = Datapoint(total_time_passed, self.x_load)
+                    self.meas_val = load_cell_tpdo1.meas_val[0]
+                    new_datapoint = Datapoint(total_time_passed, self.meas_val)
                     self.datapoints.append(new_datapoint)
 
 
