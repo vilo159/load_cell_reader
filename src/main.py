@@ -104,6 +104,7 @@ class LoadCellApp(App, BaseScreen):
     def on_start_btn(self) -> None:
         """Starts the data collection."""
         self.test_started = True
+        self.start_time = datetime.datetime.now()
         
     def on_stop_btn(self) -> None:
         """Stops the data collection."""
