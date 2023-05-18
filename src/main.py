@@ -53,10 +53,10 @@ class LoadCellApp(App, BaseScreen):
 
     # Kivy variables
     test_time = NumericProperty(0)
-    x_max = NumericProperty(0)
-    y_max = NumericProperty(0)
-    x_major = NumericProperty(0)
-    y_major = NumericProperty(0)
+    x_max = NumericProperty(2)
+    y_max = NumericProperty(2)
+    x_major = NumericProperty(0.4)
+    y_major = NumericProperty(0.4)
 
     def __init__(self, address: str, canbus_port: int, stream_every_n: int) -> None:
         super().__init__()
